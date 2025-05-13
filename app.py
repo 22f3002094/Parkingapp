@@ -12,6 +12,7 @@ def create_app():
 app = create_app()
 
 from Backend.routes import *
+from Backend.create_data import *
 
 if __name__ == "__main__":
-    app.run()
+    app.run(debug=True)
