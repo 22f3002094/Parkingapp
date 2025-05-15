@@ -1,16 +1,20 @@
 from flask_sqlalchemy import SQLAlchemy
+from flask_login import UserMixin
 
 
 db = SQLAlchemy()
 
 
-class Admin(db.Model):
+class Admin(db.Model , UserMixin):
     __tablename__ = "admin"
     id  = db.Column(db.Integer, primary_key=True ,autoincrement = True )
     email = db.Column(db.String, unique = True , nullable = False)
     password = db.Column(db.String, unique = True , nullable = False)
 
-class User(db.Model):
+    def get_id(self):
+        return self.email
+
+class User(db.Model , UserMixin):
     __tablename__ = "user"
     id  = db.Column(db.Integer, primary_key=True ,autoincrement = True)
     name = db.Column(db.String, nullable = False)
@@ -22,10 +26,13 @@ class User(db.Model):
     status = db.Column(db.String , nullable = False)
     bookings= db.relationship("Bookings", backref='user', lazy=True)
 
+    def get_id(self):
+        return self.email
 
 
 
-class ServiceCategory(db.Model):
+
+class ServiceCategory(db.Model ):
     __tablename__ = "servicecategory"
     id  = db.Column(db.Integer, primary_key=True ,autoincrement = True)
     name = db.Column(db.String, unique = True ,  nullable = False)
@@ -36,7 +43,7 @@ class ServiceCategory(db.Model):
 
 
 
-class Professional(db.Model):
+class Professional(db.Model , UserMixin):
     __tablename__ = "serviceprofessional"
     id  = db.Column(db.Integer, primary_key=True ,autoincrement = True)
     name = db.Column(db.String, nullable = False)
@@ -49,6 +56,9 @@ class Professional(db.Model):
     servicecategory_id = db.Column(db.Integer , db.ForeignKey("servicecategory.id") , nullable = False )
     packages= db.relationship('Package', backref='professional', lazy=True)
     recived_bookings = db.relationship('Bookings', backref='professional', lazy=True)
+
+    def get_id(self):
+        return self.email
 
 
 

@@ -1,6 +1,7 @@
 from flask import current_app as app
 from flask import render_template , request , redirect
 from .models import db , User , ServiceCategory,Professional , Admin
+from flask_login import login_user , login_required , current_user
 
 @app.route("/")
 def index():
@@ -79,6 +80,7 @@ def login():
             cust = db.session.query(User).filter_by(email=email).first()
             if cust :
                 if cust.password==password:
+                    login_user(cust)
                     return redirect("/dashboard/customer")
                 else:
                     return "incorrect password"
@@ -87,16 +89,20 @@ def login():
         elif role =="Admin":
             admin = db.session.query(Admin).filter_by(email=email).first()
             if admin :
+               
                 if admin.password==password:
+                    login_user(admin)
                     return redirect("/dashboard/admin")
                 else:
                     return "incorrect password"
             else:
                 return "Admin DOes not exist"
         elif role =="Professional":
-            admin = db.session.query(Professional).filter_by(email=email).first()
-            if admin :
-                if admin.password==password:
+            prof = db.session.query(Professional).filter_by(email=email).first()
+            
+            if prof :
+                if prof.password==password:
+                    login_user(prof)
                     return redirect("/dashboard/professional")
                 else:
                     return "incorrect password"
@@ -106,5 +112,13 @@ def login():
 
 
 @app.route("/dashboard/<u_type>"  , methods=["GET" , "POST"])
+@login_required
 def dashboard(u_type):
-    return f"welcome {u_type}"
+    if isinstance(current_user , User) and u_type=="customer":
+        return f"welcome User"
+    elif isinstance(current_user , Admin) and u_type=="admin":
+        return f"welcome admin"
+    elif isinstance(current_user,Professional) and u_type == "professional":
+        return f"welcome professional"
+    else : 
+        return "you are not authorised to access this route"
