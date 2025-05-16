@@ -122,3 +122,6 @@ def dashboard(u_type):
         return f"welcome professional"
     else : 
         return "you are not authorised to access this route"
+
+
+        
