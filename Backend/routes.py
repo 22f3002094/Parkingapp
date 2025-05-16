@@ -117,11 +117,16 @@ def dashboard(u_type):
     if isinstance(current_user , User) and u_type=="customer":
         return f"welcome User"
     elif isinstance(current_user , Admin) and u_type=="admin":
-        return f"welcome admin"
+        all_cats = db.session.query(ServiceCategory).all()
+        active_prof = db.session.query(Professional).filter_by(status = "Active").all()
+        requested_prof = db.session.query(Professional).filter_by(status = "Requested").all()
+        flagged_prof = db.session.query(Professional).filter_by(status = "Flagged").all()
+        active_cust = db.session.query(User).filter_by(status = "Active").all()
+        flagged_cust = db.session.query(User).filter_by(status = "Flagged").all()
+        return render_template("/admin/dashboard.html" , cu = current_user, cats = all_cats , active_prof = active_prof , requested_prof=requested_prof, flagged_prof=flagged_prof , active_cust=active_cust , flagged_cust = flagged_cust)
     elif isinstance(current_user,Professional) and u_type == "professional":
         return f"welcome professional"
     else : 
         return "you are not authorised to access this route"
 
 
-        
