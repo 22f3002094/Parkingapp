@@ -1,64 +1,124 @@
-<!DOCTYPE html>
-<html lang="en">
+{% extends "base.html" %}
+{% block title %}
+<title>Admin Dashboard | HomeEase</title>
+{% endblock%}
 
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Home Page</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.6/dist/css/bootstrap.min.css" rel="stylesheet"
-        integrity="sha384-4Q6Gf2aSP4eDXB8Miphtr37CMZZQ5oXLH2yaXMJ2w8e2ZtHTl7GptT4jmndRuHDT" crossorigin="anonymous">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.min.css">
-</head>
-
-<body>
-    <nav class="navbar navbar-expand-lg bg-body-tertiary">
-        <div class="container-fluid">
-            <a class="navbar-brand" href="#">HomeEase</a>
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse"
-                data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false"
-                aria-label="Toggle navigation">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-            <div class="collapse navbar-collapse " id="navbarSupportedContent">
-                <ul class="navbar-nav  mb-2 mb-lg-0  ms-auto me-3">
-                    <li class="nav-item">
-                        <a class="nav-link active" aria-current="page" href="#">Dashboard</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="#">Search</a>
-                    </li>
-                    <li class="nav-item dropdown">
-                        <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown"
-                            aria-expanded="false">
-                            <i class="bi bi-person fs-5 "></i>
-                        </a>
-                        <ul class="dropdown-menu dropdown-menu-end">
-                            <li><a class="dropdown-item" href="#">Profile</a></li>
-                            <li><a class="dropdown-item" href="#">Log Out</a></li>
-
-                        </ul>
-                    </li>
-                </ul>
-
-            </div>
-        </div>
-    </nav>
+{% block content %}
     <h3 class="ms-3 mt-3">Welcome Admin</h3>
+
     <div class="card m-3">
         <div class="card-header">
             <div class="d-flex d-inline">
                 <h4>Service Category</h4>
-                <button class="btn btn-warning ms-auto">New Category</button>
+                <!-- Button trigger modal -->
+                <button type="button" class="btn btn-warning ms-auto" data-bs-toggle="modal" data-bs-target="#catform">
+                    New Category
+                </button>
+
+                <!-- Modal -->
+                <div class="modal fade" id="catform" tabindex="-1" aria-labelledby="exampleModalLabel"
+                    aria-hidden="true">
+                    <div class="modal-dialog">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h1 class="modal-title fs-5" id="exampleModalLabel">Create New Category</h1>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                    aria-label="Close"></button>
+                            </div>
+                            <div class="modal-body">
+                                <div class="card">
+                                    <form class="p-4" action="/category?action=create" method="POST">
+                                        <div class="form-floating mb-3">
+                                            <input type="text" class="form-control" name="cat_name" id="floatingCatName"
+                                                placeholder="Eg.Home Cleaning" required>
+                                            <label for="floatingCatName">Category Name</label>
+                                        </div>
+                                        <div class="form-floating mb-3">
+                                            <input type="text" class="form-control" id="floatingCatdesc"
+                                                name="cat_desc">
+                                            <label for="floatingCatdesc">Category Descripition</label>
+                                        </div>
+                                        <div class="form-floating mb-3">
+                                            <input name="cat_base_price" type="text" class="form-control"
+                                                id="floatingCatbaseprice" required>
+                                            <label for="floatingCataseprice">Category Base Price</label>
+                                        </div>
+                                        <div class="d-flex justify-content-center">
+                                            <button type="submit" class="btn btn-warning">
+                                                Create
+                                            </button>
+                                        </div>
+                                    </form>
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
         <div class="card-body  ">
             <div class="row">
                 {% for cat in cats %}
-                <div class="col-4 card text-center">
-                    {{cat.name}}
-                    <button class="btn btn-warning">View</button>
+                <div class="col-2 text-center">
+                    <div class="card mb-3">
+                        <div class="card-body">
+
+                            <p>{{cat.name}}</p>
+                            <!-- Button trigger modal -->
+                            <button type="button" class="btn btn-warning ms-auto" data-bs-toggle="modal"
+                                data-bs-target="#cateditform">
+                                Edit
+                            </button>
+
+                            <!-- Modal -->
+                            <div class="modal fade" id="cateditform" tabindex="-1" aria-labelledby="exampleModalLabel"
+                                aria-hidden="true">
+                                <div class="modal-dialog">
+                                    <div class="modal-content">
+                                        <div class="modal-header">
+                                            <h1 class="modal-title fs-5" id="exampleModalLabel">Edit Category </h1>
+                                            <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                                aria-label="Close"></button>
+                                        </div>
+                                        <div class="modal-body">
+                                            <div class="card">
+                                                <form class="p-4" action="/category?action=edit&id={{cat.id}}"
+                                                    method="POST">
+                                                    <div class="form-floating mb-3">
+                                                        <input type="text" class="form-control" name="cat_name"
+                                                            id="floatingCatName" value="{{cat.name}}"
+                                                            placeholder="Eg.Home Cleaning" required>
+                                                        <label for="floatingCatName">Edit Category Name</label>
+                                                    </div>
+                                                    <div class="form-floating mb-3">
+                                                        <input type="text" class="form-control" id="floatingCatdesc"
+                                                            name="cat_desc" value="{{cat.desc}}">
+                                                        <label for="floatingCatdesc">Edit Category Descripition</label>
+                                                    </div>
+                                                    <div class="form-floating mb-3">
+                                                        <input name="cat_base_price" type="text" class="form-control"
+                                                            id="floatingCatbaseprice" value="{{cat.base_price}}"
+                                                            required>
+                                                        <label for="floatingCataseprice">Edit Base Price</label>
+                                                    </div>
+                                                    <div class="d-flex justify-content-center">
+                                                        <button type="submit" class="btn btn-warning">
+                                                            Edit
+                                                        </button>
+                                                    </div>
+                                                </form>
+                                            </div>
+                                        </div>
+
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
                 {% endfor %}
+
             </div>
         </div>
     </div>
@@ -114,7 +174,45 @@
                                 <td>{{prof.phone}}</td>
                                 <td>{{prof.status}}</td>
                                 <td>
-                                    <button class="btn btn-danger">Flag</button>
+                                    <button type="button" class="btn btn-danger " data-bs-toggle="modal"
+                                        data-bs-target="#flagprof">
+                                        flag
+                                    </button>
+
+                                    <!-- Modal -->
+                                    <div class="modal fade" id="flagprof" tabindex="-1"
+                                        aria-labelledby="exampleModalLabel" aria-hidden="true">
+                                        <div class="modal-dialog">
+                                            <div class="modal-content">
+                                                <div class="modal-header">
+                                                    <h1 class="modal-title fs-5" id="exampleModalLabel">flag Professional 
+                                                    </h1>
+                                                    <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                                        aria-label="Close"></button>
+                                                </div>
+                                                <div class="modal-body">
+                                                    
+                                                        <div class="card-body">
+                                                            <p>Are you sure you want to flag {{prof.name}}?</p>
+                                                        </div>
+                                                        
+                                                    
+                                                </div>
+                                                <div class="model-footer">
+                                                    <form class="p-4" action="/professional?action=Flag&id={{prof.id}}"
+                                                            method="POST">
+                                                            
+                                                            <div class="d-flex justify-content-center">
+                                                                <button type="submit" class="btn btn-warning">
+                                                                    Yes
+                                                                </button>
+                                                            </div>
+                                                        </form>
+                                                </div>
+
+                                            </div>
+                                        </div>
+                                    </div>
                                 </td>
                             </tr>
                             {% endfor %}
@@ -153,12 +251,86 @@
                                 <td>{{prof.phone}}</td>
                                 <td>{{prof.status}}</td>
                                 <td>
-                                    <button class="btn btn-success">
+                                    
+                                    <!-- Button trigger modal -->
+                                    <button type="button" class="btn btn-success " data-bs-toggle="modal"
+                                        data-bs-target="#Acceptprof">
                                         Accept
                                     </button>
-                                    <button class="btn btn-danger">
+
+                                    <!-- Modal -->
+                                    <div class="modal fade" id="Acceptprof" tabindex="-1"
+                                        aria-labelledby="exampleModalLabel" aria-hidden="true">
+                                        <div class="modal-dialog">
+                                            <div class="modal-content">
+                                                <div class="modal-header">
+                                                    <h1 class="modal-title fs-5" id="exampleModalLabel">Accept Professional Request
+                                                    </h1>
+                                                    <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                                        aria-label="Close"></button>
+                                                </div>
+                                                <div class="modal-body">
+                                                    
+                                                        <div class="card-body">
+                                                            <p>Are you sure you want to Accept {{prof.name}}'s request?</p>
+                                                        </div>
+                                                        
+                                                    
+                                                </div>
+                                                <div class="model-footer">
+                                                    <form class="p-4" action="/professional?action=Accept&id={{prof.id}}"
+                                                            method="POST">
+                                                            
+                                                            <div class="d-flex justify-content-center">
+                                                                <button type="submit" class="btn btn-warning">
+                                                                    Yes
+                                                                </button>
+                                                            </div>
+                                                        </form>
+                                                </div>
+
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <button type="button" class="btn btn-danger " data-bs-toggle="modal"
+                                        data-bs-target="#Rejectprof">
                                         Reject
                                     </button>
+
+                                    <!-- Modal -->
+                                    <div class="modal fade" id="Rejectprof" tabindex="-1"
+                                        aria-labelledby="exampleModalLabel" aria-hidden="true">
+                                        <div class="modal-dialog">
+                                            <div class="modal-content">
+                                                <div class="modal-header">
+                                                    <h1 class="modal-title fs-5" id="exampleModalLabel">Reject Professional Request
+                                                    </h1>
+                                                    <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                                        aria-label="Close"></button>
+                                                </div>
+                                                <div class="modal-body">
+                                                    
+                                                        <div class="card-body">
+                                                            <p>Are you sure you want to Reject {{prof.name}}'s request?</p>
+                                                        </div>
+                                                        
+                                                    
+                                                </div>
+                                                <div class="model-footer">
+                                                    <form class="p-4" action="/professional?action=Reject&id={{prof.id}}"
+                                                            method="POST">
+                                                            
+                                                            <div class="d-flex justify-content-center">
+                                                                <button type="submit" class="btn btn-warning">
+                                                                    Yes
+                                                                </button>
+                                                            </div>
+                                                        </form>
+                                                </div>
+
+                                            </div>
+                                        </div>
+                                    </div>
                                 </td>
                             </tr>
                             {% endfor %}
@@ -197,9 +369,45 @@
                                 <td>{{prof.phone}}</td>
                                 <td>{{prof.status}}</td>
                                 <td>
-                                    <button class="btn btn-warning">
-                                        Unflagged
+                                    <button type="button" class="btn btn-success " data-bs-toggle="modal"
+                                        data-bs-target="#unflaggedprof">
+                                        Unflag
                                     </button>
+
+                                    <!-- Modal -->
+                                    <div class="modal fade" id="unflaggedprof" tabindex="-1"
+                                        aria-labelledby="exampleModalLabel" aria-hidden="true">
+                                        <div class="modal-dialog">
+                                            <div class="modal-content">
+                                                <div class="modal-header">
+                                                    <h1 class="modal-title fs-5" id="exampleModalLabel">Unflag Professional 
+                                                    </h1>
+                                                    <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                                        aria-label="Close"></button>
+                                                </div>
+                                                <div class="modal-body">
+                                                    
+                                                        <div class="card-body">
+                                                            <p>Are you sure you want to Unflag {{prof.name}}?</p>
+                                                        </div>
+                                                        
+                                                    
+                                                </div>
+                                                <div class="model-footer">
+                                                    <form class="p-4" action="/professional?action=Unflag&id={{prof.id}}"
+                                                            method="POST">
+                                                            
+                                                            <div class="d-flex justify-content-center">
+                                                                <button type="submit" class="btn btn-warning">
+                                                                    Yes
+                                                                </button>
+                                                            </div>
+                                                        </form>
+                                                </div>
+
+                                            </div>
+                                        </div>
+                                    </div>
                                 </td>
                             </tr>
                             {% endfor %}
@@ -264,7 +472,45 @@
                                 <td>{{cust.phone}}</td>
                                 <td>{{cust.status}}</td>
                                 <td>
-                                    <button class="btn btn-danger">Flag</button>
+                                    <button type="button" class="btn btn-danger " data-bs-toggle="modal"
+                                        data-bs-target="#flagcust">
+                                        Flag
+                                    </button>
+
+                                    <!-- Modal -->
+                                    <div class="modal fade" id="flagcust" tabindex="-1"
+                                        aria-labelledby="exampleModalLabel" aria-hidden="true">
+                                        <div class="modal-dialog">
+                                            <div class="modal-content">
+                                                <div class="modal-header">
+                                                    <h1 class="modal-title fs-5" id="exampleModalLabel">flag customer
+                                                    </h1>
+                                                    <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                                        aria-label="Close"></button>
+                                                </div>
+                                                <div class="modal-body">
+                                                    
+                                                        <div class="card-body">
+                                                            <p>Are you sure you want to flag {{cust.name}}?</p>
+                                                        </div>
+                                                        
+                                                    
+                                                </div>
+                                                <div class="model-footer">
+                                                    <form class="p-4" action="/customer?action=Flag&id={{cust.id}}"
+                                                            method="POST">
+                                                            
+                                                            <div class="d-flex justify-content-center">
+                                                                <button type="submit" class="btn btn-warning">
+                                                                    Yes
+                                                                </button>
+                                                            </div>
+                                                        </form>
+                                                </div>
+
+                                            </div>
+                                        </div>
+                                    </div>
                                 </td>
                             </tr>
                             {% endfor %}
@@ -279,7 +525,7 @@
 
                 <div class="tab-pane fade" id="pills-cust-Flagged" role="tabpanel" aria-labelledby="pills-Flagged-tab"
                     tabindex="0">
-                   {% if flagged_cust %}
+                    {% if flagged_cust %}
                     <table class="table">
                         <thead>
                             <tr>
@@ -304,9 +550,45 @@
                                 <td>{{cust.phone}}</td>
                                 <td>{{cust.status}}</td>
                                 <td>
-                                    <button class="btn btn-warning">
-                                        Unflagged
+                                    <button type="button" class="btn btn-success " data-bs-toggle="modal"
+                                        data-bs-target="#unflagcust">
+                                        Unflag
                                     </button>
+
+                                    <!-- Modal -->
+                                    <div class="modal fade" id="unflagcust" tabindex="-1"
+                                        aria-labelledby="exampleModalLabel" aria-hidden="true">
+                                        <div class="modal-dialog">
+                                            <div class="modal-content">
+                                                <div class="modal-header">
+                                                    <h1 class="modal-title fs-5" id="exampleModalLabel">Unflag Customer
+                                                    </h1>
+                                                    <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                                        aria-label="Close"></button>
+                                                </div>
+                                                <div class="modal-body">
+                                                    
+                                                        <div class="card-body">
+                                                            <p>Are you sure you want to Unflag {{cust.name}}?</p>
+                                                        </div>
+                                                        
+                                                    
+                                                </div>
+                                                <div class="model-footer">
+                                                    <form class="p-4" action="/customer?action=Unflag&id={{cust.id}}"
+                                                            method="POST">
+                                                            
+                                                            <div class="d-flex justify-content-center">
+                                                                <button type="submit" class="btn btn-warning">
+                                                                    Yes
+                                                                </button>
+                                                            </div>
+                                                        </form>
+                                                </div>
+
+                                            </div>
+                                        </div>
+                                    </div>
                                 </td>
                             </tr>
                             {% endfor %}
@@ -323,11 +605,4 @@
         </div>
 
     </div>
-
-
-</body>
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.6/dist/js/bootstrap.bundle.min.js"
-    integrity="sha384-j1CDi7MgGQ12Z7Qab0qlWQ/Qqz24Gc6BM0thvEMVjHnfYGF0rmFCozFSxQBxwHKO"
-    crossorigin="anonymous"></script>
-
-</html>
+{% endblock %}

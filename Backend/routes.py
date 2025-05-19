@@ -1,7 +1,7 @@
 from flask import current_app as app
-from flask import render_template , request , redirect
-from .models import db , User , ServiceCategory,Professional , Admin
-from flask_login import login_user , login_required , current_user
+from flask import render_template , request , redirect , flash
+from .models import db , User , ServiceCategory,Professional , Admin ,Package
+from flask_login import login_user , login_required , current_user , logout_user
 
 @app.route("/")
 def index():
@@ -123,10 +123,162 @@ def dashboard(u_type):
         flagged_prof = db.session.query(Professional).filter_by(status = "Flagged").all()
         active_cust = db.session.query(User).filter_by(status = "Active").all()
         flagged_cust = db.session.query(User).filter_by(status = "Flagged").all()
-        return render_template("/admin/dashboard.html" , cu = current_user, cats = all_cats , active_prof = active_prof , requested_prof=requested_prof, flagged_prof=flagged_prof , active_cust=active_cust , flagged_cust = flagged_cust)
+        return render_template("/admin/dashboard.html" , page="dashboard", cu = current_user, cats = all_cats , active_prof = active_prof , requested_prof=requested_prof, flagged_prof=flagged_prof , active_cust=active_cust , flagged_cust = flagged_cust)
     elif isinstance(current_user,Professional) and u_type == "professional":
-        return f"welcome professional"
+        
+        return render_template("/professional/dashboard.html" , page="dashboard" , cu = current_user    )
     else : 
         return "you are not authorised to access this route"
 
 
+@app.route("/category" , methods=["POST"])
+def category():
+    if request.args.get("action") == "create":
+        data  = request.form
+        cat = db.session.query(ServiceCategory).filter_by(name = data.get("cat_name")).first()
+        if not cat:
+            cat = ServiceCategory(name = data.get("cat_name") , desc = data.get("cat_desc") , base_price = data.get("cat_base_price"))
+            db.session.add(cat)
+            db.session.commit()
+            flash("Category is Created." , "success")
+            return redirect("/dashboard/admin")
+        else: 
+            flash("Category already Exists." , "warning")
+            return redirect("/dashboard/admin")
+    elif request.args.get("action") == "edit":
+        data  = request.form
+        cat = db.session.query(ServiceCategory).filter_by(id = request.args.get("id")).first()
+        if cat:
+            if data.get("cat_name"):
+                if db.session.query(ServiceCategory).filter_by(name=data.get("cat_name")).count() == 0 :
+                    cat.name = data.get("cat_name")
+            
+            cat.desc = data.get("cat_desc")
+            if data.get("cat_base_price"):
+                cat.base_price = data.get("cat_base_price")
+            db.session.commit()
+            flash("Category is Updated." , "success")
+            
+            return redirect("/dashboard/admin")
+        else:
+            flash("Category is not found." , "danger")
+            return redirect("/dashboard/admin")
+    
+
+
+@app.route("/professional" , methods=["POST"])
+def professional():
+    if request.args.get("action") == "Accept":
+        prof = db.session.query(Professional).filter_by(id = request.args.get("id")).first()
+        if prof:
+            prof.status="Active"
+            db.session.commit()
+            flash(f"{prof.name}'s request is Accepted." , "success")
+            return redirect("/dashboard/admin")
+        else: 
+            flash(f"Professional doesn't exist." , "danger")
+            return redirect("/dashboard/admin")
+    
+    elif request.args.get("action") == "Reject":
+        prof = db.session.query(Professional).filter_by(id = request.args.get("id")).first()
+        if prof:
+            prof.status="Rejected"
+            db.session.commit()
+            flash(f"{prof.name}'s request is Rejected." , "success")
+            return redirect("/dashboard/admin")
+        else: 
+            flash(f"Professional doesn't exist." , "danger")
+            return redirect("/dashboard/admin")
+    elif request.args.get("action") == "Flag":
+        prof = db.session.query(Professional).filter_by(id = request.args.get("id")).first()
+        if prof:
+            prof.status="Flagged"
+            db.session.commit()
+            flash(f"{prof.name} is flagged", "success")
+            return redirect("/dashboard/admin")
+        else: 
+            flash(f"Professional doesn't exist.", "danger")
+            return redirect("/dashboard/admin")
+    elif request.args.get("action") == "Unflag":
+        prof = db.session.query(Professional).filter_by(id = request.args.get("id")).first()
+        if prof:
+            prof.status="Active"
+            db.session.commit()
+            flash(f"{prof.name} is unflagged." , "success")
+            return redirect("/dashboard/admin")
+        else: 
+            flash(f"Professional doesn't exist." , "danger")
+            return redirect("/dashboard/admin")
+        
+
+@app.route("/customer" , methods=["POST"])
+def customer():
+    if request.args.get("action") == "Flag":
+        cust = db.session.query(User).filter_by(id = request.args.get("id")).first()
+        if cust:
+            cust.status="Flagged"
+            db.session.commit()
+            flash(f"{cust.name} is Flagged." ,"success")
+            return redirect("/dashboard/admin")
+        else: 
+            flash(f"Customer doesn't exist.", "danger")
+            return redirect("/dashboard/admin")
+    elif request.args.get("action") == "Unflag":
+        cust = db.session.query(User).filter_by(id = request.args.get("id")).first()
+        if cust:
+            cust.status="Active"
+            db.session.commit()
+            flash(f"{cust.name} is unflagged." ,"success")
+            return redirect("/dashboard/admin")
+        else: 
+            flash(f"Customer doesn't exist." , "danger")
+            return redirect("/dashboard/admin")
+        
+
+
+@app.route("/package" , methods=["POST"])
+def package():
+    if request.args.get("action") == "create":
+        data  = request.form
+        cat = db.session.query(ServiceCategory).filter_by(id = current_user.servicecategory_id).first()
+        if cat:
+            pack = Package(name=data.get("pack_name") , desc = data.get("pack_desc") ,price=data.get("pack_price") , servicecategory_id= current_user.servicecategory_id , professional_id = current_user.id)
+            db.session.add(pack)
+            db.session.commit()
+            flash("Package is Created." , "success")
+            return redirect("/dashboard/professional")
+        else: 
+            flash("Catgory doesn't Exists." , "warning")
+            return redirect("/dashboard/admin")
+    elif request.args.get("action") == "edit":
+        data  = request.form
+        pack = db.session.query(Package).filter_by(id = request.args.get("id")).first()
+        if pack:
+            
+            if data.get("pack_name"):
+                pack.name = data.get("pack_name")
+            if data.get("pack_desc"):
+                pack.desc = data.get("pack_desc")
+            if data.get("pack_price"):
+                pack.price = data.get("pack_price")
+            
+            db.session.commit()
+            flash("Package is Updated." , "success")
+            return redirect("/dashboard/professional")
+        else: 
+            flash("Package doesn't Exists." , "warning")
+            return redirect("/dashboard/admin")    
+
+
+@app.route("/logout")
+@login_required
+def log_out():
+    logout_user()
+    return redirect("/login")
+
+    
+
+
+@app.route("/search/admin" , methods=["GET" , "POST"])
+def search_admin():
+    return render_template("/admin/search.html" ,page="search", cu = current_user)

@@ -1,0 +1,149 @@
+{% extends "base.html" %}
+{% block title %}
+<title>Professional Dashboard | HomeEase</title>
+{% endblock%}
+
+{% block content %}
+
+    {% if cu.status=="Active"%}
+        <h2>Welcome Professional</h2>
+        <div class="card m-3">
+        <div class="card-header">
+            <div class="d-flex d-inline">
+                <h4>Packages</h4>
+                <!-- Button trigger modal -->
+                <button type="button" class="btn btn-warning ms-auto" data-bs-toggle="modal" data-bs-target="#packageform">
+                    New Packages
+                </button>
+
+                <!-- Modal -->
+                <div class="modal fade" id="packageform" tabindex="-1" aria-labelledby="exampleModalLabel"
+                    aria-hidden="true">
+                    <div class="modal-dialog">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h1 class="modal-title fs-5" id="exampleModalLabel">Create New Package</h1>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                    aria-label="Close"></button>
+                            </div>
+                            <div class="modal-body">
+                                <div class="card">
+                                    <form class="p-4" action="/package?action=create" method="POST">
+                                        <div class="form-floating mb-3">
+                                            <input type="text" class="form-control" name="pack_name" id="floatingpackName"
+                                                placeholder="Eg.Home Cleaning" required>
+                                            <label for="floatingpackName">Package Name</label>
+                                        </div>
+                                        <div class="form-floating mb-3">
+                                            <input type="text" class="form-control" id="floatingpackdesc"
+                                                name="pack_desc">
+                                            <label for="floatingpackdesc">Package Descripition</label>
+                                        </div>
+                                        <div class="form-floating mb-3">
+                                            <input name="pack_price" type="text" class="form-control"
+                                                id="floatingpackprice" required>
+                                            <label for="floatingpackprice">Package Price</label>
+                                        </div>
+                                        <div class="d-flex justify-content-center">
+                                            <button type="submit" class="btn btn-warning">
+                                                Create
+                                            </button>
+                                        </div>
+                                    </form>
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="card-body  ">
+            {% if cu.packages %}
+            <div class="row">
+                {% for pack in cu.packages %}
+                <div class="col-2 text-center">
+                    <div class="card mb-3">
+                        <div class="card-body">
+
+                            <p>{{pack.name}}</p>
+                            <!-- Button trigger modal -->
+                            <button type="button" class="btn btn-warning ms-auto" data-bs-toggle="modal"
+                                data-bs-target="#packeditform">
+                                Edit
+                            </button>
+
+                            <!-- Modal -->
+                            <div class="modal fade" id="packeditform" tabindex="-1" aria-labelledby="exampleModalLabel"
+                                aria-hidden="true">
+                                <div class="modal-dialog">
+                                    <div class="modal-content">
+                                        <div class="modal-header">
+                                            <h1 class="modal-title fs-5" id="exampleModalLabel">Edit Package </h1>
+                                            <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                                aria-label="Close"></button>
+                                        </div>
+                                        <div class="modal-body">
+                                            <div class="card">
+                                                <form class="p-4" action="/package?action=edit&id={{pack.id}}"
+                                                    method="POST">
+                                                    <div class="form-floating mb-3">
+                                                        <input type="text" class="form-control" name="pack_name"
+                                                            id="floatingpackName" value="{{pack.name}}"
+                                                            placeholder="Eg.Home Cleaning" required>
+                                                        <label for="floatingpackName">Edit Package Name</label>
+                                                    </div>
+                                                    <div class="form-floating mb-3">
+                                                        <input type="text" class="form-control" id="floatingpackdesc"
+                                                            name="pack_desc" value="{{pack.desc}}">
+                                                        <label for="floatingpackdesc">Edit package Descripition</label>
+                                                    </div>
+                                                    <div class="form-floating mb-3">
+                                                        <input name="pack_price" type="text" class="form-control"
+                                                            id="floatingpackprice" value="{{pack.price}}"
+                                                            required>
+                                                        <label for="floatingpackprice">Edit Price</label>
+                                                    </div>
+                                                    <div class="d-flex justify-content-center">
+                                                        <button type="submit" class="btn btn-warning">
+                                                            Edit
+                                                        </button>
+                                                    </div>
+                                                </form>
+                                            </div>
+                                        </div>
+
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+
+            </div>
+            {% else %}
+            <p> No package to show</p>
+            {% endif %}
+        </div>
+    </div>
+
+    {% elif cu.status=="Requested" %}
+    <div class="d-flex justify-content-center mt-5 align-items-center">
+        <div class="alert alert-warning">
+        <p>Your Request has been sent to Admin. Wait for Admin's approval</p>
+        </div>
+    </div>
+
+    {% elif cu.status=="Flagged" %}
+
+    <div class="d-flex justify-content-center mt-5 align-items-center">
+        <div class="alert alert-danger">
+            <p>You have been flagged</p>
+
+        </div>
+
+    </div>
+    {% endif %}
+{% endblock %}
+
